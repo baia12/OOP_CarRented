@@ -160,6 +160,7 @@ public class CarRentalSystem {
     }
 
     public void run() {
+        initDummyData();
         System.out.println("=== Welcome to University Car Rental System ===");
         boolean exit = false;
         while (!exit) {
@@ -190,6 +191,32 @@ public class CarRentalSystem {
             }
         }
     }
+      private void initDummyData() {
+        // Adding users
+        User user1 = new User("Alice Johnson", "A111111", "UniX", "U12345", "alice", "pass1");
+        user1.setVerified(true);
+        User user2 = new User("Bob Lee", "B222222", "UniX", "U67890", "bob", "pass2");
+        // not verified
+        users.add(user1);
+        users.add(user2);
+        // Adding cars
+        cars.add(new Car("Toyota Camry", 80));
+        cars.add(new Car("Honda Civic", 50));
+        cars.add(new Car("Tesla Model 3", 100));
+        // Adding bookings: Alice has one current booking
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            Date rentDate = sdf.parse("2024-06-01 10:00");
+            Date returnDate = sdf.parse("2024-06-01 18:00");
+            Booking b = new Booking(user1, cars.get(0), rentDate, returnDate, false, "");
+            b.setReturned(false);
+            cars.get(0).setAvailable(false);
+            bookings.add(b);
+        }catch (Exception e) {
+            System.out.println("Error creating dummy bookings: " + e.getMessage());
+        }
+    }
+
 
     // Admin functionalities
     private void adminLogin() {
