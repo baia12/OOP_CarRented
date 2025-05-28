@@ -4,12 +4,15 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 
 public class CarRentalSystemApp extends Application {
@@ -42,9 +45,11 @@ public class CarRentalSystemApp extends Application {
         users.add(user2);
         
         // Adding cars
-        cars.add(new Car("Toyota Camry", 80));
-        cars.add(new Car("Honda Civic", 50));
-        cars.add(new Car("Tesla Model 3", 100));
+       cars.add(new Car("Toyota Camry", 80, 4.5));
+       cars.add(new Car("Honda Civic", 65, 4.3));
+       cars.add(new Car("Proton X70", 70, 4.2));
+       cars.add(new Car("Perodua Myvi", 90, 4.0));
+       cars.add(new Car("Tesla Model 3", 100, 4.8));
         
         // Adding bookings
         try {
@@ -60,30 +65,44 @@ public class CarRentalSystemApp extends Application {
         }
     }
     
-    private void showMainMenu() {
-        VBox root = new VBox(20);
-        root.setPadding(new Insets(30));
-        root.setAlignment(Pos.CENTER);
-        root.setStyle("-fx-background-color: #f0f0f0;");
-        
-        Label titleLabel = new Label("University Car Rental System");
-        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
-        
-        Button adminLoginBtn = createStyledButton("Admin Login", "#3498db");
-        Button userLoginBtn = createStyledButton("User Login", "#2ecc71");
-        Button registerBtn = createStyledButton("Register as User", "#f39c12");
-        Button exitBtn = createStyledButton("Exit", "#e74c3c");
-        
-        adminLoginBtn.setOnAction(e -> showAdminLogin());
-        userLoginBtn.setOnAction(e -> showUserLogin());
-        registerBtn.setOnAction(e -> showUserRegistration());
-        exitBtn.setOnAction(e -> primaryStage.close());
-        
-        root.getChildren().addAll(titleLabel, adminLoginBtn, userLoginBtn, registerBtn, exitBtn);
-        
-        Scene scene = new Scene(root, 400, 350);
-        primaryStage.setScene(scene);
+   private void showMainMenu() {
+    VBox root = new VBox(20);
+    root.setPadding(new Insets(30));
+    root.setAlignment(Pos.CENTER);
+    root.setStyle("-fx-background-color: #f0f0f0;");
+
+    // Load image from URL
+    try {
+        String imageUrl = "https://w7.pngwing.com/pngs/787/429/png-transparent-lightning-mcqueen-mater-doc-hudson-cars-cars-3-red-lightning-mcqueen-car-desktop-wallpaper-pixar.png"; // example IIUM logo
+        Image logoImage = new Image(imageUrl);
+        ImageView logoView = new ImageView(logoImage);
+        logoView.setFitWidth(200);
+    
+        logoView.setPreserveRatio(true);
+        root.getChildren().add(logoView);
+    } catch (Exception e) {
+        System.out.println("Failed to load logo image: " + e.getMessage());
     }
+
+    Label titleLabel = new Label("University Car Rental System");
+    titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+    Button adminLoginBtn = createStyledButton("Admin Login", "#3498db");
+    Button userLoginBtn = createStyledButton("User Login", "#2ecc71");
+    Button registerBtn = createStyledButton("Register as User", "#f39c12");
+    Button exitBtn = createStyledButton("Exit", "#e74c3c");
+
+    adminLoginBtn.setOnAction(e -> showAdminLogin());
+    userLoginBtn.setOnAction(e -> showUserLogin());
+    registerBtn.setOnAction(e -> showUserRegistration());
+    exitBtn.setOnAction(e -> primaryStage.close());
+
+    root.getChildren().addAll(titleLabel, adminLoginBtn, userLoginBtn, registerBtn, exitBtn);
+
+    Scene scene = new Scene(root, 500, 500);
+    primaryStage.setScene(scene);
+}
+
     
     private Button createStyledButton(String text, String color) {
         Button button = new Button(text);
@@ -200,45 +219,65 @@ public class CarRentalSystemApp extends Application {
         primaryStage.setScene(scene);
     }
     
+   
     private void showVerifyUser() {
-        VBox root = new VBox(15);
-        root.setPadding(new Insets(30));
-        root.setAlignment(Pos.CENTER);
-        root.setStyle("-fx-background-color: #ecf0f1;");
-        
-        Label titleLabel = new Label("Verify User");
-        titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
-        
-        TextField usernameField = new TextField();
-        usernameField.setPromptText("Enter username to verify");
-        
-        Button verifyBtn = createStyledButton("Verify", "#2ecc71");
-        Button backBtn = createStyledButton("Back", "#95a5a6");
-        
-        verifyBtn.setOnAction(e -> {
-            User u = findUserByUsername(usernameField.getText());
-            if (u == null) {
-                showAlert("Error", "User not found.");
-            } else if (u.isVerified()) {
-                showAlert("Info", "User already verified.");
-            } else {
-                u.setVerified(true);
-                showAlert("Success", "User " + u.getUsername() + " verified.");
-                usernameField.clear();
-            }
-        });
-        
-        backBtn.setOnAction(e -> showAdminMenu());
-        
-        HBox buttonBox = new HBox(10);
-        buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.getChildren().addAll(verifyBtn, backBtn);
-        
-        root.getChildren().addAll(titleLabel, usernameField, buttonBox);
-        
-        Scene scene = new Scene(root, 400, 250);
-        primaryStage.setScene(scene);
+    VBox root = new VBox(15);
+    root.setPadding(new Insets(30));
+    root.setAlignment(Pos.CENTER);
+    root.setStyle("-fx-background-color: #ecf0f1;");
+
+    Label titleLabel = new Label("Verify User");
+    titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+    ComboBox<User> userComboBox = new ComboBox<>();
+    for (User u : users) {
+        if (!u.isVerified()) {
+            userComboBox.getItems().add(u);
+        }
     }
+    userComboBox.setPromptText("Select user to verify");
+
+    userComboBox.setCellFactory(param -> new ListCell<User>() {
+        @Override
+        protected void updateItem(User item, boolean empty) {
+            super.updateItem(item, empty);
+            setText(empty || item == null ? null : item.getUsername() + " - " + item.getFullName());
+        }
+    });
+    userComboBox.setButtonCell(new ListCell<User>() {
+        @Override
+        protected void updateItem(User item, boolean empty) {
+            super.updateItem(item, empty);
+            setText(empty || item == null ? null : item.getUsername() + " - " + item.getFullName());
+        }
+    });
+
+    Button verifyBtn = createStyledButton("Verify", "#2ecc71");
+    Button backBtn = createStyledButton("Back", "#95a5a6");
+
+    verifyBtn.setOnAction(e -> {
+        User selectedUser = userComboBox.getValue();
+        if (selectedUser == null) {
+            showAlert("Error", "Please select a user.");
+        } else {
+            selectedUser.setVerified(true);
+            showAlert("Success", "User " + selectedUser.getUsername() + " verified.");
+            userComboBox.getItems().remove(selectedUser);
+        }
+    });
+
+    backBtn.setOnAction(e -> showAdminMenu());
+
+    HBox buttonBox = new HBox(10);
+    buttonBox.setAlignment(Pos.CENTER);
+    buttonBox.getChildren().addAll(verifyBtn, backBtn);
+
+    root.getChildren().addAll(titleLabel, userComboBox, buttonBox);
+
+    Scene scene = new Scene(root, 400, 250);
+    primaryStage.setScene(scene);
+}
+
     
     private void showAddCar() {
         VBox root = new VBox(15);
@@ -271,7 +310,7 @@ public class CarRentalSystemApp extends Application {
                 if (fuel < 0 || fuel > 100) {
                     showAlert("Error", "Fuel must be between 0 and 100.");
                 } else {
-                    Car car = new Car(modelField.getText(), fuel);
+                    Car car = new Car(modelField.getText(), fuel,4);
                     cars.add(car);
                     showAlert("Success", "Car added: " + modelField.getText());
                     modelField.clear();
@@ -403,113 +442,134 @@ public class CarRentalSystemApp extends Application {
         Scene scene = new Scene(root, 400, 350);
         primaryStage.setScene(scene);
     }
-    
-    private void showBookCar() {
-        if (!loggedInUser.isVerified()) {
-            showAlert("Error", "You must be verified by admin to book a car.");
-            return;
-        }
-        
-        List<Car> availableCars = new ArrayList<>();
-        for (Car c : cars) {
-            if (c.isAvailable()) {
-                availableCars.add(c);
-            }
-        }
-        
-        if (availableCars.isEmpty()) {
-            showAlert("Info", "No cars available now.");
-            return;
-        }
-        
-        VBox root = new VBox(15);
-        root.setPadding(new Insets(20));
-        root.setStyle("-fx-background-color: #ecf0f1;");
-        
-        Label titleLabel = new Label("Book a Car");
-        titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
-        
-        ComboBox<Car> carComboBox = new ComboBox<>();
-        carComboBox.getItems().addAll(availableCars);
-        carComboBox.setPromptText("Select a car");
-        
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        
-        TextField rentDateField = new TextField();
-        TextField returnDateField = new TextField();
-        CheckBox deliveryCheckBox = new CheckBox("Delivery Service");
-        TextField deliveryLocationField = new TextField();
-        
-        rentDateField.setPromptText("yyyy-MM-dd HH:mm");
-        returnDateField.setPromptText("yyyy-MM-dd HH:mm");
-        deliveryLocationField.setPromptText("Delivery location");
-        deliveryLocationField.setDisable(true);
-        
-        deliveryCheckBox.setOnAction(e -> {
-            deliveryLocationField.setDisable(!deliveryCheckBox.isSelected());
-        });
-        
-        grid.add(new Label("Select Car:"), 0, 0);
-        grid.add(carComboBox, 1, 0);
-        grid.add(new Label("Rental Date & Time:"), 0, 1);
-        grid.add(rentDateField, 1, 1);
-        grid.add(new Label("Return Date & Time:"), 0, 2);
-        grid.add(returnDateField, 1, 2);
-        grid.add(deliveryCheckBox, 0, 3);
-        grid.add(deliveryLocationField, 1, 3);
-        
-        Button bookBtn = createStyledButton("Book Car", "#2ecc71");
-        Button backBtn = createStyledButton("Back", "#95a5a6");
-        
-        bookBtn.setOnAction(e -> {
-            if (carComboBox.getValue() == null) {
-                showAlert("Error", "Please select a car.");
-                return;
-            }
-            
-            Date rentDate = parseDate(rentDateField.getText());
-            Date returnDate = parseDate(returnDateField.getText());
-            
-            if (rentDate == null) {
-                showAlert("Error", "Invalid rental date format.");
-                return;
-            }
-            
-            if (returnDate == null || !returnDate.after(rentDate)) {
-                showAlert("Error", "Invalid return date.");
-                return;
-            }
-            
-            boolean delivery = deliveryCheckBox.isSelected();
-            String deliveryLoc = deliveryLocationField.getText();
-            
-            if (delivery && deliveryLoc.trim().isEmpty()) {
-                showAlert("Error", "Delivery location required.");
-                return;
-            }
-            
-            Car selectedCar = carComboBox.getValue();
-            Booking booking = new Booking(loggedInUser, selectedCar, rentDate, returnDate, delivery, deliveryLoc);
-            bookings.add(booking);
-            selectedCar.setAvailable(false);
-            
-            showAlert("Success", "Booking created! Booking ID: " + booking.getBookingId());
-            showUserMenu();
-        });
-        
-        backBtn.setOnAction(e -> showUserMenu());
-        
-        HBox buttonBox = new HBox(10);
-        buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.getChildren().addAll(bookBtn, backBtn);
-        
-        root.getChildren().addAll(titleLabel, grid, buttonBox);
-        
-        Scene scene = new Scene(root, 500, 400);
-        primaryStage.setScene(scene);
+    //BOOKING PLACE
+   private void showBookCar() {
+    if (!loggedInUser.isVerified()) {
+        showAlert("Error", "You must be verified by admin to book a car.");
+        return;
     }
+
+    List<Car> availableCars = new ArrayList<>();
+    for (Car c : cars) {
+        if (c.isAvailable()) {
+            availableCars.add(c);
+        }
+    }
+
+    if (availableCars.isEmpty()) {
+        showAlert("Info", "No cars available now.");
+        return;
+    }
+
+    VBox root = new VBox(15);
+    root.setPadding(new Insets(20));
+    root.setStyle("-fx-background-color: #ecf0f1;");
+
+    Label titleLabel = new Label("Book a Car");
+    titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+    ComboBox<Car> carComboBox = new ComboBox<>();
+    carComboBox.getItems().addAll(availableCars);
+    carComboBox.setPromptText("Select a car");
+
+    GridPane grid = new GridPane();
+    grid.setHgap(10);
+    grid.setVgap(10);
+
+    DatePicker rentDatePicker = new DatePicker();
+    ComboBox<String> rentTimeBox = createTimeComboBox();
+
+    DatePicker returnDatePicker = new DatePicker();
+    ComboBox<String> returnTimeBox = createTimeComboBox();
+
+    CheckBox deliveryCheckBox = new CheckBox("Delivery Service");
+    TextField deliveryLocationField = new TextField();
+
+    deliveryLocationField.setPromptText("Delivery location");
+    deliveryLocationField.setDisable(true);
+
+    deliveryCheckBox.setOnAction(e -> deliveryLocationField.setDisable(!deliveryCheckBox.isSelected()));
+
+    grid.add(new Label("Select Car:"), 0, 0);
+    grid.add(carComboBox, 1, 0);
+    grid.add(new Label("Rental Date:"), 0, 1);
+    grid.add(rentDatePicker, 1, 1);
+    grid.add(new Label("Rental Time:"), 0, 2);
+    grid.add(rentTimeBox, 1, 2);
+    grid.add(new Label("Return Date:"), 0, 3);
+    grid.add(returnDatePicker, 1, 3);
+    grid.add(new Label("Return Time:"), 0, 4);
+    grid.add(returnTimeBox, 1, 4);
+    grid.add(deliveryCheckBox, 0, 5);
+    grid.add(deliveryLocationField, 1, 5);
+
+    Button bookBtn = createStyledButton("Book Car", "#2ecc71");
+    Button backBtn = createStyledButton("Back", "#95a5a6");
+
+    bookBtn.setOnAction(e -> {
+        if (carComboBox.getValue() == null) {
+            showAlert("Error", "Please select a car.");
+            return;
+        }
+
+        Date rentDate = parseDateTime(rentDatePicker.getValue(), rentTimeBox.getValue());
+        Date returnDate = parseDateTime(returnDatePicker.getValue(), returnTimeBox.getValue());
+
+        if (rentDate == null || returnDate == null || !returnDate.after(rentDate)) {
+            showAlert("Error", "Invalid date/time selection.");
+            return;
+        }
+
+        boolean delivery = deliveryCheckBox.isSelected();
+        String deliveryLoc = deliveryLocationField.getText();
+
+        if (delivery && deliveryLoc.trim().isEmpty()) {
+            showAlert("Error", "Delivery location required.");
+            return;
+        }
+
+        Car selectedCar = carComboBox.getValue();
+        Booking booking = new Booking(loggedInUser, selectedCar, rentDate, returnDate, delivery, deliveryLoc);
+        bookings.add(booking);
+        selectedCar.setAvailable(false);
+
+        showAlert("Success", "Booking created! Here Your Booking ID: " + booking.getBookingId());
+        showUserMenu();
+    });
+
+    backBtn.setOnAction(e -> showUserMenu());
+
+    HBox buttonBox = new HBox(10);
+    buttonBox.setAlignment(Pos.CENTER);
+    buttonBox.getChildren().addAll(bookBtn, backBtn);
+
+    root.getChildren().addAll(titleLabel, grid, buttonBox);
+
+    Scene scene = new Scene(root, 500, 450);
+    primaryStage.setScene(scene);
+}
+/// calendar POPUP
+   private ComboBox<String> createTimeComboBox() { 
+    ComboBox<String> timeBox = new ComboBox<>();
+    for (int hour = 0; hour < 24; hour++) {
+        for (int min = 0; min < 60; min += 30) {
+            String time = String.format("%02d:%02d", hour, min);
+            timeBox.getItems().add(time);
+        }
+    }
+    timeBox.setPromptText("Select Time");
+    return timeBox;
+}
+private Date parseDateTime(LocalDate date, String time) {
+    if (date == null || time == null) return null;
+    try {
+        String dateTimeStr = date.toString() + " " + time;
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(dateTimeStr);
+    } catch (Exception e) {
+        return null;
+    }
+}
+
     
     private void showReturnCar() {
         List<Booking> userActiveBookings = new ArrayList<>();
@@ -520,7 +580,7 @@ public class CarRentalSystemApp extends Application {
         }
         
         if (userActiveBookings.isEmpty()) {
-            showAlert("Info", "No active bookings to return.");
+            showAlert("Info", "Bro you does not have any booking ");
             return;
         }
         
