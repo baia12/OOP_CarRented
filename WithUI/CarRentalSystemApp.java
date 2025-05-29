@@ -73,7 +73,7 @@ public class CarRentalSystemApp extends Application {
 
     // Load image from URL
     try {
-        String imageUrl = "https://w7.pngwing.com/pngs/787/429/png-transparent-lightning-mcqueen-mater-doc-hudson-cars-cars-3-red-lightning-mcqueen-car-desktop-wallpaper-pixar.png"; // example IIUM logo
+        String imageUrl = "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHp4M2Q5eWM2am01eXprNWU0c2VkMGs4MHgxMHQ5ZHhjamJvMGhmOCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3ov9jWu7BuHufyLs7m/giphy.gif"; // example IIUM logo
         Image logoImage = new Image(imageUrl);
         ImageView logoView = new ImageView(logoImage);
         logoView.setFitWidth(200);
@@ -97,7 +97,8 @@ public class CarRentalSystemApp extends Application {
     registerBtn.setOnAction(e -> showUserRegistration());
     exitBtn.setOnAction(e -> primaryStage.close());
 
-    root.getChildren().addAll(titleLabel, adminLoginBtn, userLoginBtn, registerBtn, exitBtn);
+    root.getChildren().addAll(titleLabel, userLoginBtn,adminLoginBtn);
+    // root.getChildren().addAll(titleLabel, adminLoginBtn, userLoginBtn, registerBtn, exitBtn);
 
     Scene scene = new Scene(root, 500, 500);
     primaryStage.setScene(scene);
@@ -387,6 +388,7 @@ public class CarRentalSystemApp extends Application {
         grid.add(passwordField, 1, 1);
         
         Button loginBtn = createStyledButton("Login", "#2ecc71");
+        Button RegisterBtn = createStyledButton("Register", "#2ecc71");
         Button backBtn = createStyledButton("Back", "#95a5a6");
         
         loginBtn.setOnAction(e -> {
@@ -402,12 +404,12 @@ public class CarRentalSystemApp extends Application {
                 showUserMenu();
             }
         });
-        
+        RegisterBtn.setOnAction(e->showUserRegistration());
         backBtn.setOnAction(e -> showMainMenu());
         
         HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.getChildren().addAll(loginBtn, backBtn);
+        buttonBox.getChildren().addAll(loginBtn, backBtn,RegisterBtn);
         
         root.getChildren().addAll(titleLabel, grid, buttonBox);
         
@@ -430,12 +432,13 @@ public class CarRentalSystemApp extends Application {
         Button logoutBtn = createStyledButton("Logout", "#e74c3c");
         
         bookCarBtn.setOnAction(e -> showBookCar());
-        returnCarBtn.setOnAction(e -> showReturnCar());
+        
         myBookingsBtn.setOnAction(e -> showMyBookings());
         logoutBtn.setOnAction(e -> {
             loggedInUser = null;
             showMainMenu();
         });
+        returnCarBtn.setOnAction(e->showReturnCarStep1());
         
         root.getChildren().addAll(titleLabel, bookCarBtn, returnCarBtn, myBookingsBtn, logoutBtn);
         
@@ -571,85 +574,124 @@ private Date parseDateTime(LocalDate date, String time) {
 }
 
     
-    private void showReturnCar() {
-        List<Booking> userActiveBookings = new ArrayList<>();
-        for (Booking b : bookings) {
-            if (b.getUser().equals(loggedInUser) && !b.isReturned()) {
-                userActiveBookings.add(b);
-            }
+    private void showReturnCarStep1() {
+    List<Booking> userActiveBookings = new ArrayList<>();
+    for (Booking b : bookings) {
+        if (b.getUser().equals(loggedInUser) && !b.isReturned()) {
+            userActiveBookings.add(b);
         }
-        
-        if (userActiveBookings.isEmpty()) {
-            showAlert("Info", "Bro you does not have any booking ");
+    }
+
+    if (userActiveBookings.isEmpty()) {
+        showAlert("Info", "Bro you do not have any booking.");
+        return;
+    }
+
+    VBox root = new VBox(15);
+    root.setPadding(new Insets(20));
+    root.setStyle("-fx-background-color: #ecf0f1;");
+
+    Label titleLabel = new Label("Return a Car (Step 1)");
+    titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+    ComboBox<Booking> bookingComboBox = new ComboBox<>();
+    bookingComboBox.getItems().addAll(userActiveBookings);
+    bookingComboBox.setPromptText("Select booking to return");
+
+    TextField fuelField = new TextField();
+    fuelField.setPromptText("Fuel level on return (0-100)");
+
+    Button nextBtn = createStyledButton("Next", "#2ecc71");
+    Button backBtn = createStyledButton("Back", "#95a5a6");
+
+    nextBtn.setOnAction(e -> {
+        Booking selectedBooking = bookingComboBox.getValue();
+        if (selectedBooking == null) {
+            showAlert("Error", "Please select a booking.");
             return;
         }
-        
-        VBox root = new VBox(15);
-        root.setPadding(new Insets(20));
-        root.setStyle("-fx-background-color: #ecf0f1;");
-        
-        Label titleLabel = new Label("Return a Car");
-        titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
-        
-        ComboBox<Booking> bookingComboBox = new ComboBox<>();
-        bookingComboBox.getItems().addAll(userActiveBookings);
-        bookingComboBox.setPromptText("Select booking to return");
-        
-        TextField fuelField = new TextField();
-        fuelField.setPromptText("Fuel level on return (0-100)");
-        
-        CheckBox paymentCheckBox = new CheckBox("Payment Completed");
-        
-        Button returnBtn = createStyledButton("Return Car", "#e67e22");
-        Button backBtn = createStyledButton("Back", "#95a5a6");
-        
-        returnBtn.setOnAction(e -> {
-            if (bookingComboBox.getValue() == null) {
-                showAlert("Error", "Please select a booking.");
+        try {
+            double fuel = Double.parseDouble(fuelField.getText());
+            if (fuel < 0 || fuel > 100) {
+                showAlert("Error", "Fuel must be between 0 and 100.");
                 return;
             }
-            
-            try {
-                double fuel = Double.parseDouble(fuelField.getText());
-                if (fuel < 0 || fuel > 100) {
-                    showAlert("Error", "Fuel must be between 0 and 100.");
-                    return;
-                }
-                
-                Booking booking = bookingComboBox.getValue();
-                Date now = new Date();
-                boolean late = now.after(booking.getReturnDate());
-                boolean paymentMade = paymentCheckBox.isSelected();
-                
-                booking.finalizeCost(fuel, paymentMade, late);
-                booking.generateReceipt();
-                booking.getCar().setFuelLevel(fuel);
-                booking.getCar().setAvailable(true);
-                
-                String message = "Car returned.\nTotal cost: $" + String.format("%.2f", booking.getTotalCost());
-                if (!paymentMade) {
-                    message += "\nYou are blacklisted due to non-payment. Contact admin.";
-                }
-                
-                showAlert("Success", message);
-                showUserMenu();
-                
-            } catch (NumberFormatException ex) {
-                showAlert("Error", "Invalid fuel level.");
-            }
-        });
-        
-        backBtn.setOnAction(e -> showUserMenu());
-        
-        HBox buttonBox = new HBox(10);
-        buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.getChildren().addAll(returnBtn, backBtn);
-        
-        root.getChildren().addAll(titleLabel, bookingComboBox, fuelField, paymentCheckBox, buttonBox);
-        
-        Scene scene = new Scene(root, 400, 300);
-        primaryStage.setScene(scene);
-    }
+            showReturnCarStep2(selectedBooking, fuel);
+        } catch (NumberFormatException ex) {
+            showAlert("Error", "Invalid fuel level.");
+        }
+    });
+    
+
+    backBtn.setOnAction(e -> showUserMenu());
+
+    HBox buttonBox = new HBox(10, nextBtn, backBtn);
+    buttonBox.setAlignment(Pos.CENTER);
+
+    root.getChildren().addAll(titleLabel, bookingComboBox, fuelField, buttonBox);
+
+    Scene scene = new Scene(root, 400, 300);
+    primaryStage.setScene(scene);
+}
+
+
+
+private void showReturnCarStep2(Booking booking, double fuel) {
+    VBox root = new VBox(15);
+    root.setPadding(new Insets(20));
+    root.setAlignment(Pos.CENTER);
+    root.setStyle("-fx-background-color: #ecf0f1;");
+
+    Label titleLabel = new Label("Payment (Step 2)");
+    titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+    // Estimate cost first (temporary calculation without finalizing)
+    Date now = new Date();
+    boolean late = now.after(booking.getReturnDate());
+    double estimatedCost = booking.calculateBaseCost();
+    if (booking.isDelivered()) estimatedCost += 15;
+    if (late) estimatedCost += 20;
+    if (fuel < 15) estimatedCost += 10;
+    else if (fuel > 15) estimatedCost -= 5;
+
+    Label costLabel = new Label("Total Cost: $" + String.format("%.2f", estimatedCost));
+    costLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #34495e;");
+
+    Image qrImage = new Image("https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=PayNow"); // Change to real link if needed
+    ImageView qrView = new ImageView(qrImage);
+
+    CheckBox paymentCheckBox = new CheckBox("Payment Completed");
+///payment
+    Button confirmBtn = createStyledButton("Confirm Return", "#e67e22");
+    Button backBtn = createStyledButton("Back", "#95a5a6");
+
+    confirmBtn.setOnAction(e -> {
+        boolean paymentMade = paymentCheckBox.isSelected();
+        booking.finalizeCost(fuel, paymentMade, late);
+        booking.generateReceipt();
+        booking.getCar().setFuelLevel(fuel);
+        booking.getCar().setAvailable(true);
+
+        String msg = "Car returned.\nTotal cost: $" + String.format("%.2f", booking.getTotalCost());
+        if (!paymentMade) {
+            msg += "\nYou are blacklisted due to non-payment.";
+           
+
+        }
+
+        showAlert("Success", msg);
+        showUserMenu();
+    });
+
+    backBtn.setOnAction(e -> showReturnCarStep1());
+
+    root.getChildren().addAll(titleLabel, costLabel, qrView, paymentCheckBox, new HBox(10, confirmBtn, backBtn));
+
+    Scene scene = new Scene(root, 400, 450);
+    primaryStage.setScene(scene);
+}
+
+
     
     private void showMyBookings() {
         VBox root = new VBox(15);
