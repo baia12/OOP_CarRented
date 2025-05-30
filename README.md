@@ -33,6 +33,6 @@ This JavaFX-based application simulates a car rental system where:
 1. Make sure you have JavaFX SDK set up properly in your IDE (e.g., IntelliJ or Eclipse).
 2. Clone the repo:
    ```bash
-   git clone https://github.com/yourusername/OOP_CarRented.git
+   git clone https://github.com/baia12/OOP_CarRented.git
 
 
