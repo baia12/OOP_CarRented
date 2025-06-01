@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat;
 
 /**
  * Represents a car rental booking made by a user.
- * Make by FAIZUL NAZRI
+ * Make by FAIZUL NAZRI and FITRI RAZMAN
  */
 public class Booking {
     private static int nextId = 1; // Static ID generator for unique booking IDs
