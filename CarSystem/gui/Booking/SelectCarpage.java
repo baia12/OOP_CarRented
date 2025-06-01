@@ -21,6 +21,12 @@ import model.Car;
 import model.User;
 import tools.Toolset;
 
+/**
+ * SelectCarpage.java
+ * Allows verified users to view and select available cars to book.
+ * 
+ * Made by: WAN SYAFIQ and FITRI
+ */
 public class SelectCarpage {
 
     private CarRentalSystemApp rentalSystem;
@@ -29,13 +35,15 @@ public class SelectCarpage {
     private Stage primaryStage;
     private User loggedInUser;
 
-    public SelectCarpage(CarRentalSystemApp rentalSystem,Stage stage, User user, List<Car> cars) {
+    // Constructor
+    public SelectCarpage(CarRentalSystemApp rentalSystem, Stage stage, User user, List<Car> cars) {
         this.primaryStage = stage;
         this.loggedInUser = user;
         this.cars = cars;
-        this.rentalSystem=rentalSystem;
+        this.rentalSystem = rentalSystem;
     }
 
+    // Returns the scene showing available cars
     public Scene getScene() {
         VBox root = new VBox(20);
         root.setPadding(new Insets(20));
@@ -50,13 +58,14 @@ public class SelectCarpage {
         carPane.setAlignment(Pos.CENTER);
         carPane.setPadding(new Insets(10));
         carPane.setPrefWrapLength(550);
-        carPane.setStyle("-fx-background-color: transparent;");
 
+        // If user is not verified, block access to booking
         if (!loggedInUser.isVerified()) {
             tools.showAlert("Error", "You must be verified by admin to book a car.");
-            return new Scene(new VBox(), 400, 300); // fallback empty scene
+            return new Scene(new VBox(), 400, 300);
         }
 
+        // Display each available car
         for (Car car : cars) {
             if (!car.isAvailable()) continue;
 
@@ -70,6 +79,7 @@ public class SelectCarpage {
                     "-fx-padding: 15;" +
                     "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);");
 
+            // Show star rating
             Label star = new Label(" ★");
             star.setStyle("-fx-text-fill: #f1c40f; -fx-font-size: 16px;");
 
@@ -78,37 +88,41 @@ public class SelectCarpage {
             HBox ratingBox = new HBox(2, ratingLabel, star);
             ratingBox.setAlignment(Pos.CENTER);
 
+            // Car image
             ImageView carImage = new ImageView(new Image(car.getImageUrl()));
             carImage.setFitWidth(150);
             carImage.setFitHeight(100);
 
+            // Car name
             Label nameLabel = new Label(car.getModel());
             nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #333;");
 
+            // Select button
             Button selectBtn = tools.createStyledButton("SELECT", "#2ecc71");
             selectBtn.setOnAction(e -> {
-               
                 tools.showAlert("Selected", "You selected: " + car.getModel());
-                 BookCarPage menu = new BookCarPage(rentalSystem,primaryStage, loggedInUser,car,cars);
+                BookCarPage menu = new BookCarPage(rentalSystem, primaryStage, loggedInUser, car, cars);
                 primaryStage.setScene(menu.getScene());
             });
 
+            // Add car info to box
             carBox.getChildren().addAll(carImage, nameLabel, ratingBox, selectBtn);
             carPane.getChildren().add(carBox);
         }
 
+        // Make car list scrollable
         ScrollPane scrollPane = new ScrollPane(carPane);
         scrollPane.setFitToWidth(true);
         scrollPane.setPrefHeight(400);
-        scrollPane.setStyle("-fx-background: transparent;");
 
+        // Back button
         Button backBtn = tools.createStyledButton("Back", "#95a5a6");
         backBtn.setOnAction(e -> {
-           
             UserMenuPage menu = new UserMenuPage(rentalSystem, primaryStage, loggedInUser);
             primaryStage.setScene(menu.getScene());
         });
 
+        // Combine all in main layout
         root.getChildren().addAll(title, scrollPane, backBtn);
         return new Scene(root, 600, 500);
     }
