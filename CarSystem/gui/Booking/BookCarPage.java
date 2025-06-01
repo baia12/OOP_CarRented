@@ -9,57 +9,71 @@ import javafx.stage.Stage;
 import model.Booking;
 import model.Car;
 import model.User;
+
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
 import MAin.CarRentalSystemApp;
 import gui.User.UserMenuPage;
+import tools.Toolset;
 
-
+/**
+ * BookCarPage.java
+ * This class handles the car booking form for users.
+ * 
+ * Created by: WAN SYAFIQ and Faizul
+ */
 public class BookCarPage {
-    private CarRentalSystemApp rentalSystem ;
+    private CarRentalSystemApp rentalSystem;
     private User loggedInUser;
     private Car selectedCar;
-
     private List<Car> cars;
     private Stage primaryStage;
+    private Toolset tools = new Toolset();  // Utility class for styling and alerts
 
-    public BookCarPage(CarRentalSystemApp rentalSystem,Stage stage, User user, Car car, List<Car> cars) {
+    // Constructor to initialize the booking page
+    public BookCarPage(CarRentalSystemApp rentalSystem, Stage stage, User user, Car car, List<Car> cars) {
         this.primaryStage = stage;
         this.loggedInUser = user;
         this.selectedCar = car;
-        this.cars=cars;
-        this.rentalSystem=rentalSystem;
-    
+        this.cars = cars;
+        this.rentalSystem = rentalSystem;
     }
 
+    // Main UI scene for booking page
     public Scene getScene() {
         VBox root = new VBox(15);
         root.setPadding(new Insets(20));
         root.setAlignment(Pos.CENTER);
         root.setStyle("-fx-background-color: #ecf0f1;");
 
+        // Title
         Label titleLabel = new Label("Booking Details for: " + selectedCar.getModel());
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
 
+        // Form grid
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setAlignment(Pos.CENTER);
 
+        // Date and time selection
         DatePicker rentDatePicker = new DatePicker();
         ComboBox<String> rentTimeBox = createTimeComboBox();
         DatePicker returnDatePicker = new DatePicker();
         ComboBox<String> returnTimeBox = createTimeComboBox();
 
+        // Delivery options
         CheckBox deliveryCheckBox = new CheckBox("Delivery Service");
         TextField deliveryLocationField = new TextField();
         deliveryLocationField.setPromptText("Delivery location");
         deliveryLocationField.setDisable(true);
 
+        // Toggle delivery field based on checkbox
         deliveryCheckBox.setOnAction(e -> deliveryLocationField.setDisable(!deliveryCheckBox.isSelected()));
 
+        // Add form components to grid
         grid.add(new Label("Rental Date:"), 0, 0);
         grid.add(rentDatePicker, 1, 0);
         grid.add(new Label("Rental Time:"), 0, 1);
@@ -71,15 +85,18 @@ public class BookCarPage {
         grid.add(deliveryCheckBox, 0, 4);
         grid.add(deliveryLocationField, 1, 4);
 
-        Button bookBtn = createStyledButton("Confirm Booking", "#2ecc71");
-        Button backBtn = createStyledButton("Back", "#95a5a6");
+        // Buttons
+        Button bookBtn = tools.createStyledButton("Confirm Booking", "#2ecc71");
+        Button backBtn = tools.createStyledButton("Back", "#95a5a6");
 
+        // Booking logic
         bookBtn.setOnAction(e -> {
             Date rentDate = parseDateTime(rentDatePicker.getValue(), rentTimeBox.getValue());
             Date returnDate = parseDateTime(returnDatePicker.getValue(), returnTimeBox.getValue());
 
+            // Basic validation
             if (rentDate == null || returnDate == null || !returnDate.after(rentDate)) {
-                showAlert("Error", "Invalid date/time selection.");
+                tools.showAlert("Error", "Invalid date/time selection.");
                 return;
             }
 
@@ -87,22 +104,25 @@ public class BookCarPage {
             String deliveryLoc = deliveryLocationField.getText();
 
             if (delivery && deliveryLoc.trim().isEmpty()) {
-                showAlert("Error", "Delivery location required.");
+                tools.showAlert("Error", "Delivery location required.");
                 return;
             }
 
+            // Create booking
             Booking booking = new Booking(loggedInUser, selectedCar, rentDate, returnDate, delivery, deliveryLoc);
-           rentalSystem.getBookings().add(booking);//send to carrental
-            selectedCar.setAvailable(false);
+            rentalSystem.getBookings().add(booking);  // Store booking in system
+            selectedCar.setAvailable(false);  // Mark car as unavailable
 
+            // Confirmation
+            tools.showAlert("Success", "Booking created! Booking ID: " + booking.getBookingId());
 
-            showAlert("Success", "Booking created! Booking ID: " + booking.getBookingId());
-            UserMenuPage menu = new UserMenuPage(rentalSystem,primaryStage, loggedInUser);
-            primaryStage.setScene(menu.getScene());
+            // Redirect to user menu
+            primaryStage.setScene(new UserMenuPage(rentalSystem, primaryStage, loggedInUser).getScene());
         });
 
+        // Go back to car selection
         backBtn.setOnAction(e -> {
-            SelectCarpage menu = new SelectCarpage(rentalSystem,primaryStage, loggedInUser,cars);
+            SelectCarpage menu = new SelectCarpage(rentalSystem, primaryStage, loggedInUser, cars);
             primaryStage.setScene(menu.getScene());
         });
 
@@ -113,6 +133,7 @@ public class BookCarPage {
         return new Scene(root, 600, 450);
     }
 
+    // Helper to create a time selection dropdown
     private ComboBox<String> createTimeComboBox() {
         ComboBox<String> timeBox = new ComboBox<>();
         timeBox.getItems().addAll("08:00", "10:00", "12:00", "14:00", "16:00", "18:00");
@@ -120,6 +141,7 @@ public class BookCarPage {
         return timeBox;
     }
 
+    // Combine date and time strings into java.util.Date object
     private Date parseDateTime(java.time.LocalDate date, String time) {
         try {
             if (date == null || time == null) return null;
@@ -129,19 +151,5 @@ public class BookCarPage {
         } catch (Exception e) {
             return null;
         }
-    }
-
-    private Button createStyledButton(String text, String color) {
-        Button btn = new Button(text);
-        btn.setStyle("-fx-background-color: " + color + "; -fx-text-fill: white; -fx-font-weight: bold;");
-        return btn;
-    }
-
-    private void showAlert(String title, String msg) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(msg);
-        alert.showAndWait();
     }
 }
