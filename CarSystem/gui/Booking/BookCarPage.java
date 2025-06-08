@@ -22,7 +22,7 @@ import tools.Toolset;
  * BookCarPage.java
  * This class handles the car booking form for users.
  * 
- * Created by: WAN SYAFIQ and Faizul
+ * Created by: FAIZUL ISYRAF
  */
 public class BookCarPage {
     private CarRentalSystemApp rentalSystem;
