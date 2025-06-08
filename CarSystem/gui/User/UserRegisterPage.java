@@ -18,7 +18,7 @@ import tools.Toolset;
  * This page allows new users to register by filling in required details.
  * After registration, user will be added to the system but must be verified by admin before booking.
  * 
- * Created by: DINIE and FITRI
+ * Created by: WAN ZUL
  */
 public class UserRegisterPage {
    
