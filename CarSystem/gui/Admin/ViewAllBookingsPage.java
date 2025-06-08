@@ -19,7 +19,7 @@ import tools.Toolset;
  * This page allows the admin to view a list of all user bookings.
  * It displays booking details in a non-editable TextArea.
  *
- * Made by: WAN ZUL IR'FAN and FAIZUL ISYRAF
+ * Made by:FAIZUL ISYRAF and WAN SYAFIQ
  */
 
 public class ViewAllBookingsPage {
