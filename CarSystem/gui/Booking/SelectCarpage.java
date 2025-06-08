@@ -25,7 +25,7 @@ import tools.Toolset;
  * SelectCarpage.java
  * Allows verified users to view and select available cars to book.
  * 
- * Made by: WAN SYAFIQ and FITRI
+ * Made by: WAN SYAFIQ 
  */
 public class SelectCarpage {
 
