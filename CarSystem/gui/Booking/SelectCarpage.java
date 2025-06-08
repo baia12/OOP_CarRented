@@ -62,7 +62,8 @@ public class SelectCarpage {
         // If user is not verified, block access to booking
         if (!loggedInUser.isVerified()) {
             tools.showAlert("Error", "You must be verified by admin to book a car.");
-            return new Scene(new VBox(), 400, 300);
+            UserMenuPage menu = new UserMenuPage(rentalSystem, primaryStage, loggedInUser);
+            return menu.getScene(); 
         }
 
         // Display each available car
