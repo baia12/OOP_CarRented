@@ -19,7 +19,7 @@ import tools.Toolset;
  * This page is shown after a user logs in.
  * It lets the user book a car, return a car, view their bookings, or log out.
  * 
- * Created by: ALL MEMBERS
+ * Created by: Dinie Huamaidi
  */
 public class UserMenuPage {
 
