@@ -23,6 +23,8 @@ import gui.Admin.AdminLoginPage;
 
 /**
  * Main class for launching the Car Rental System application.
+ make BY DINIE
+ 
  */
 public class CarRentalSystemApp extends Application {
 
