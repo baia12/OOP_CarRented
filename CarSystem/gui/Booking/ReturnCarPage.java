@@ -51,7 +51,10 @@ public class ReturnCarPage {
         // If user has no active bookings
         if (userActiveBookings.isEmpty()) {
             tools.showAlert("Info", "Bro you do not have any booking.");
-            return new Scene(new VBox(), 400, 200); // return blank scene
+            
+            // Redirect to User Menu Page
+           UserMenuPage menu = new UserMenuPage(rentalSystem, primaryStage, loggedInUser);
+         return menu.getScene();
         }
 
         // UI Setup
