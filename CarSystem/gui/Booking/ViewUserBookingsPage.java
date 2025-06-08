@@ -20,7 +20,7 @@ import tools.Toolset;
  * ViewUserBookingsPage.java
  * Shows a logged-in user their personal booking history.
  * 
- * Made by: FAIZUL and DINIE
+ * Made by: WAN SYAFIQ and FAIZUL ISYRAF
  */
 public class ViewUserBookingsPage {
 
