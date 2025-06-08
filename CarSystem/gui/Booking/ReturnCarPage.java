@@ -20,7 +20,7 @@ import gui.User.UserMenuPage;
  * Handles the return process of a car by the user.
  * User selects an active booking to return, and the system proceeds to payment.
  * 
- * Made by: WAN SYAFIQ and DINIE
+ * Made by: FITRI
  */
 public class ReturnCarPage {
 
