@@ -19,7 +19,7 @@ import model.User;
  * This class serves as the main control panel for the admin.
  * Admin can view unverified users, verify users, see all bookings, or log out.
  * 
- * Made by: WAN ZUL 'IRFAN and DINIE HUMAIDI 
+ * Made by: DINIE HUMAIDI 
  */
 
 public class AdminMenuPage {
