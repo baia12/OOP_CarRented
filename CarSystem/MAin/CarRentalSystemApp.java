@@ -58,7 +58,7 @@ public class CarRentalSystemApp extends Application {
         root.setAlignment(Pos.CENTER);
         root.setStyle("-fx-background-color: #f0f0f0;");
 
-        // Load and display logo (optional)
+        // Load and display logo 
         try {
             String imageUrl = "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHp4M2Q5eWM2am01eXprNWU0c2VkMGs4MHgxMHQ5ZHhjamJvMGhmOCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3ov9jWu7BuHufyLs7m/giphy.gif";
             Image logoImage = new Image(imageUrl);
@@ -141,8 +141,8 @@ public class CarRentalSystemApp extends Application {
         // Dummy booking
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-            Date rentDate = sdf.parse("2024-06-01 10:00");
-            Date returnDate = sdf.parse("2024-06-01 18:00");
+            Date rentDate = sdf.parse("2024-06-04 10:00");
+            Date returnDate = sdf.parse("2024-06-05 18:00");
 
             Booking b = new Booking(user1, cars.get(0), rentDate, returnDate, false, "");
             b.setReturned(false);
