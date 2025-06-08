@@ -66,7 +66,7 @@ public class PaymentPage {
         Label costLabel = new Label("Total Cost: RM " + String.format("%.2f", estimatedCost));
         costLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #34495e;");
 
-        // QR code image (for fun or simulation)
+        // QR code image 
         Image qrImage = new Image("https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://youtu.be/L8XbI9aJOXk?si=QjHpyAV40os3gHCo");
         ImageView qrView = new ImageView(qrImage);
 
