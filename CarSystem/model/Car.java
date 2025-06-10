@@ -5,7 +5,7 @@ package model;
  * 
  * Represents a car object in the car rental system.
  * 
- * Made by: WAN SYAFIQ
+ * Made by: WAN SHAFIQ
  */
 
 public class Car {
